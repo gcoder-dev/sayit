@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+</head>
+<body>
+    <div id="header">
+
+    </div>
+
+    <div id="users">
+
+    </div>
+
+    <div id="messages">
+
+    </div>
+</body>
+<link rel="stylesheet" href="static/landing_style.css">
+<script>
+    user = `<div class="user">
+                <p>New</p>
+            </div>`
+
+    function parseHTML(html) {
+        var t = document.createElement('template');
+        t.innerHTML = html;
+        t.setAttribute("class", "democlass");
+        return t.content;
+    }
+
+    function addUser(Text) {
+        let html = parseHTML(user)
+        document.getElementById('users').append(html)
+    }
+
+</script>
+
+
+<script>
+    const closeConnOp = 0
+    const registerOp = 1
+    const addUserOp = 2
+
+    const conn = new WebSocket("ws://" + document.location.host + "/ws");
+    conn.onopen = function (evt) {
+        let request = {Type: registerOp, Message:""}
+        conn.send(JSON.stringify(request))
+    };
+
+    conn.onmessage = function (evt) {
+        const obj = JSON.parse(evt.data);
+        if (obj.type === addUserOp) {
+            addUser(obj.Text)
+        }
+    };
+
+    window.addEventListener('beforeunload', () => {
+        let request = {Type: closeConnOp, Message:""}
+        conn.send(JSON.stringify(request))
+    });
+</script>
+</html>
